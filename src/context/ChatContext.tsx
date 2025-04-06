@@ -47,7 +47,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       messages: [{
         id: Date.now().toString(),
         role: 'bot',
-        content: 'How do you want to start today?\n\n1. How you feel\n2. Start with a goal',
+        content: 'How do you want to start today?\nSelect one of the following options',
         timestamp: new Date(),
       }],
       createdAt: new Date(),
@@ -109,7 +109,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newMessage: ChatMessage = {
         id: newMessageId,
         role: 'bot',
-        content: 'How do you want to start today?\n\n1. How you feel\n2. Start with a goal',
+        content: 'How do you want to start today?\nSelect one of the following options',
         timestamp: new Date(),
       };
 
