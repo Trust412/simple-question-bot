@@ -450,11 +450,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newStep = 3;
           break;
           case 3: // After user shares how they're feeling now
-          botResponse = "How are you feeling about this now?";
+            botResponse = `Where and how do you feel ${content} now?`;
             newStep = 4;
             break;
           case 4: // After user shares how they want to feel
-            botResponse = `What would it feel like to feel ${content}?`;
+            botResponse = `What would it feel like to ${content}?`;
             newStep = 5;
             break;
           case 5: // Final response based on their feelings
@@ -480,11 +480,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newStep = 4;
             break;
           case 4: // After user describes how they're feeling now
-            botResponse = "How are you feeling about this now?";
+            botResponse = `Where and how do you feel ${content} now?`;
             newStep = 5;
             break;
           case 5: // After user describes how they want to feel
-            botResponse = `Feel ${content} — what does ${content} feel like?`;
+            botResponse = `What would it feel like to ${content}?`;
             newStep = 6;
             break;
           case 6: // Final response based on their goal
