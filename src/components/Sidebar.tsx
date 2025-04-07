@@ -55,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
   return (
     <div 
       className={cn(
-        "flex flex-col h-full bg-slate-100 border-r",
+        "flex flex-col h-full bg-gray-100 border-r",
         isMobile ? (
           isMobileSidebarOpen 
             ? "fixed inset-y-0 left-0 z-50 w-64 animate-slide-in" 
@@ -63,8 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
         ) : "w-64"
       )}
     >
-      <div className="flex items-center justify-between p-4 border-b bg-slate-200">
-        <h2 className="text-lg font-medium text-slate-800">Chats</h2>
+      <div className="flex items-center justify-between p-4 border-b bg-gray-200">
+        <h2 className="text-lg font-medium text-gray-800">Chats</h2>
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={handleCloseSidebar}>
             <X className="h-5 w-5" />
@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
             variant={currentSessionId === session.id ? "secondary" : "ghost"}
             className={cn(
               "w-full justify-start mb-1 text-left",
-              currentSessionId === session.id ? "bg-slate-200 text-slate-900" : "text-slate-700"
+              currentSessionId === session.id ? "bg-gray-200 text-gray-900" : "text-gray-700"
             )}
             onClick={() => switchSession(session.id)}
           >
@@ -91,16 +91,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
       
       {/* Cycle Check Section */}
       {shouldShowCheckButton() && (
-        <div className="p-4 border-t bg-slate-50">
+        <div className="p-4 border-t bg-gray-50">
           <div className="mb-4">
-            <h3 className="text-sm font-medium text-slate-800 mb-1">Feeling check</h3>
+            <h3 className="text-sm font-medium text-gray-800 mb-1">Feeling check</h3>
             {isCycleActive ? (
               <div className="space-y-3">
-                <p className="text-xs text-slate-600">{getLastBotQuestion()}</p>
+                <p className="text-xs text-gray-600">{getLastBotQuestion()}</p>
                 <div className="flex space-x-2">
                   <Button 
                     onClick={() => handleCycleResponse(true)}
-                    className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 text-white"
                     size="sm"
                   >
                     <CheckCircle2 className="mr-1 h-4 w-4" />
@@ -108,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
                   </Button>
                   <Button 
                     onClick={() => handleCycleResponse(false)}
-                    className="flex-1 bg-slate-500 hover:bg-slate-600 text-white"
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 text-white"
                     size="sm"
                   >
                     <XCircle className="mr-1 h-4 w-4" />
@@ -119,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
             ) : (
               <Button 
                 onClick={startCycleCheck}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                className="w-full bg-gray-500 hover:bg-gray-600 text-white"
                 size="sm"
                 disabled={!isCheckButtonActive}
               >
@@ -131,10 +131,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
         </div>
       )}
       
-      <div className="p-4 border-t bg-slate-50">
+      <div className="p-4 border-t bg-gray-50">
         <Button 
           onClick={createNewSession} 
-          className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+          className="w-full bg-gray-500 hover:bg-gray-600 text-white"
         >
           <Plus className="mr-2 h-4 w-4" />
           New Chat
