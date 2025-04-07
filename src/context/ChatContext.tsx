@@ -228,6 +228,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (cycleStep === 'primary' && !isStillFeeling) {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
+            const lastUserMessage = session.messages.filter(msg => msg.role === 'user').pop();
             return {
               ...session,
               messages: [
@@ -235,7 +236,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: "How are you feeling about this now?",
+                  content: `Where and how do you feel ${lastUserMessage?.content} now?`,
                   timestamp: new Date(),
                 }
               ],
@@ -286,35 +287,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check if user wants to start a new conversation after completing the previous one
   const handleConversationRestart = (content: string) => {
-    const lowerContent = content.toLowerCase().trim();
-    const positiveResponses = ['yes', 'ok', 'sure', 'yeah', 'yep', 'start', 'again', 'restart', 'continue'];
-    
-    if (positiveResponses.some(response => lowerContent.includes(response))) {
-      // User wants to start again
-      const newMessageId = Date.now().toString();
-      const newMessage: ChatMessage = {
-        id: newMessageId,
-        role: 'bot',
-        content: 'How do you want to start today?\n\n1. How you feel\n2. Start with a goal',
-        timestamp: new Date(),
-      };
-
-      setSessions(prev => prev.map(session => {
-        if (session.id === currentSessionId) {
-          return {
-            ...session,
-            currentStep: 0,
-            path: null,
-            messages: [...session.messages, newMessage],
-            updatedAt: new Date(),
-          };
-        }
-        return session;
-      }));
-      
-      return true;
-    } else {
-      // User doesn't want to continue
       const goodbyeMessages = [
         "Thank you for chatting with me today! Take care and come back anytime.",
         "It was great talking with you. Wishing you a wonderful day ahead!",
@@ -343,16 +315,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return session;
       }));
       
-      // After sending goodbye message, create a new session automatically
       setTimeout(() => {
         createNewSession();
       }, 2000);
       
       return true;
-    }
   };
 
-  // Handle sending a message
   const sendMessage = (content: string) => {
     if (!currentSessionId || !currentSession) return;
 
