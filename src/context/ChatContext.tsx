@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ChatMessage, ChatSession, PathType } from '../types/chat';
-import { findBestResponse } from '../data/responses';
+import { ChatSession, PathType } from '../types/chat';
 
 // Define the shape of our context
 interface ChatContextType {
@@ -11,32 +10,68 @@ interface ChatContextType {
   sendMessage: (content: string) => void;
   selectPath: (path: PathType) => void;
   currentSession: ChatSession | null;
+  cycleRepeat: number;
   isTyping: boolean;
   isMobileSidebarOpen: boolean;
   setIsMobileSidebarOpen: (isOpen: boolean) => void;
   startCycleCheck: () => void;
   isCycleActive: boolean;
+  isFeelingChecked: boolean;
+  isGoalChecked: boolean;
   handleCycleResponse: (isStillFeeling: boolean) => void;
   cycleStep: 'primary' | 'secondary' | null;
+  feelingAnswers: {
+    feeling_answer1: string;
+    feeling_answer2: string;
+    feeling_answer3: string;
+    feeling_answer4: string;
+  };
+  goalAnswers: {
+    goal_answer1: string;
+    goal_answer2: string;
+    goal_answer3: string;
+    goal_answer4: string;
+    goal_answer5: string;
+  };
 }
 
 // Create the context
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 // Create a provider component
-export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCycleActive, setIsCycleActive] = useState(false);
   const [cycleStep, setCycleStep] = useState<'primary' | 'secondary' | null>(null);
+  const [cycleRepeat, setCycleRepeat] = useState<number>(0);
+  // Add state variables for feeling and goal answers
+  const [feelingAnswers, setFeelingAnswers] = useState({
+    feeling_answer1: '',
+    feeling_answer2: '',
+    feeling_answer3: '',
+    feeling_answer4: ''
+  });
+  
+  const [isFeelingChecked, setIsFeelingChecked] = useState(false);
+  const [isGoalChecked, setIsGoalChecked] = useState(false);
+
+  const [goalAnswers, setGoalAnswers] = useState({
+    goal_answer1: '',
+    goal_answer2: '',
+    goal_answer3: '',
+    goal_answer4: '',
+    goal_answer5: ''
+  });
 
   // Initialize a session on first load
   useEffect(() => {
     if (sessions.length === 0) {
       createNewSession();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Get the current session
@@ -60,11 +95,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updatedAt: new Date(),
       currentStep: 0,
     };
-
+    setCycleRepeat(0);
     setSessions(prev => [...prev, newSession]);
     setCurrentSessionId(newSessionId);
     setIsCycleActive(false);
     setCycleStep(null);
+    setIsFeelingChecked(false);
+    setIsGoalChecked(false);
   };
 
   // Switch to a different session
@@ -76,44 +113,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Get user's first and second answers for cycle questioning
-  const getUserAnswers = () => {
-    if (!currentSession) return { primaryFeeling: '', secondaryDescription: '' };
-    
-    const userMessages = currentSession.messages.filter(msg => msg.role === 'user');
-    
-    let primaryFeeling = '';
-    let secondaryDescription = '';
-    
-    // For the feeling path, the first answer is the primary feeling
-    if (currentSession.path === 'feeling' && userMessages.length >= 1) {
-      primaryFeeling = userMessages[0].content;
-      
-      // The second answer is the description of that feeling
-      if (userMessages.length >= 2) {
-        secondaryDescription = userMessages[1].content;
-      }
-    }
-    
-    // For the goal path, the first answer is what they want to achieve
-    // and the second is what achieving it would feel like
-    else if (currentSession.path === 'goal' && userMessages.length >= 2) {
-      primaryFeeling = userMessages[1].content;
-      
-      if (userMessages.length >= 3) {
-        secondaryDescription = userMessages[2].content;
-      }
-    }
-    
-    return { primaryFeeling, secondaryDescription };
-  };
+
 
   // Start the cycle check process
   const startCycleCheck = () => {
     if (!currentSession) return;
     
-    const { secondaryDescription } = getUserAnswers();
     
-    if (!secondaryDescription) return;
     
     setIsTyping(true);
     setCycleStep('secondary');
@@ -130,7 +136,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               {
                 id: botMessageId,
                 role: 'bot',
-                content: `Do you still feel ${secondaryDescription}?`,
+                content: `Do you still feel ${feelingAnswers.feeling_answer2}?`,
                 timestamp: new Date(),
               }
             ],
@@ -140,17 +146,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return session;
       }));
       setIsTyping(false);
-    }, 1000);
+    }, 300);
   };
 
   // Handle user's response to a cycle question
   const handleCycleResponse = (isStillFeeling: boolean) => {
     if (!currentSession) return;
-    
-    const { primaryFeeling, secondaryDescription } = getUserAnswers();
-    
     setIsTyping(true);
-    
+    setCycleRepeat(cycleRepeat + 1);
     setTimeout(() => {
       const botMessageId = Date.now().toString();
       
@@ -165,11 +168,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Do you still feel ${secondaryDescription}?`,
+                  content: `Do you still feel ${feelingAnswers.feeling_answer2}?`,
                   timestamp: new Date(),
                 }
               ],
               updatedAt: new Date(),
+              currentStep: session.path === 'feeling' ? 2 : 3,
             };
           }
           return session;
@@ -188,11 +192,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Do you still feel ${primaryFeeling}?`,
+                  content: `Do you still feel ${feelingAnswers.feeling_answer1}?`,
                   timestamp: new Date(),
                 }
               ],
               updatedAt: new Date(),
+              currentStep: session.path === 'feeling' ? 2 : 3,
             };
           }
           return session;
@@ -210,12 +215,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Feel ${primaryFeeling} — what does ${primaryFeeling} feel like?`,
+                  content: `Feel ${feelingAnswers.feeling_answer1} — what does ${feelingAnswers.feeling_answer1} feel like?`,
                   timestamp: new Date(),
                 }
               ],
               updatedAt: new Date(),
-              currentStep: 2, // Reset to the step where we ask what the feeling feels like
+              currentStep: session.path === 'feeling' ? 2 : 3,
             };
           }
           return session;
@@ -228,7 +233,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (cycleStep === 'primary' && !isStillFeeling) {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
-            const lastUserMessage = session.messages.filter(msg => msg.role === 'user').pop();
             return {
               ...session,
               messages: [
@@ -236,11 +240,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Where and how do you feel ${lastUserMessage?.content} now?`,
+                  content: `If you don't feel ${feelingAnswers.feeling_answer1} anymore, you can leave the chat. Wish you a successful day! 😁😁😁`,
                   timestamp: new Date(),
                 }
               ],
               updatedAt: new Date(),
+              currentStep: session.path === 'feeling' ? 5 : 6,
             };
           }
           return session;
@@ -248,8 +253,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCycleStep(null);
         setIsCycleActive(false);
         setIsTyping(false);
+        if (currentSession?.path === 'feeling') {
+          setIsFeelingChecked(true);
+        } else {
+          setIsGoalChecked(true);
+        }
       }
-    }, 1000);
+    }, 300);
   };
 
   // Select conversation path (feeling or goal)
@@ -285,81 +295,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  // Check if user wants to start a new conversation after completing the previous one
-  const handleConversationRestart = (content: string) => {
-      const goodbyeMessages = [
-        "Thank you for chatting with me today! Take care and come back anytime.",
-        "It was great talking with you. Wishing you a wonderful day ahead!",
-        "Thanks for the conversation. Hope to chat with you again soon!",
-        "I enjoyed our talk. Have a lovely day and see you next time!"
-      ];
-      
-      const randomGoodbye = goodbyeMessages[Math.floor(Math.random() * goodbyeMessages.length)];
-      
-      const newMessageId = Date.now().toString();
-      const newMessage: ChatMessage = {
-        id: newMessageId,
-        role: 'bot',
-        content: randomGoodbye,
-        timestamp: new Date(),
-      };
-
-      setSessions(prev => prev.map(session => {
-        if (session.id === currentSessionId) {
-          return {
-            ...session,
-            messages: [...session.messages, newMessage],
-            updatedAt: new Date(),
-          };
-        }
-        return session;
-      }));
-      
-      setTimeout(() => {
-        createNewSession();
-      }, 2000);
-      
-      return true;
-  };
-
   const sendMessage = (content: string) => {
     if (!currentSessionId || !currentSession) return;
-
-    // Check if we're waiting for a restart confirmation
-    if ((currentSession.path === 'feeling' && currentSession.currentStep === 5) ||
-        (currentSession.path === 'goal' && currentSession.currentStep === 6)) {
-      
-      // Add user message first
-      const userMessageId = Date.now().toString();
-      setSessions(prev => prev.map(session => {
-        if (session.id === currentSessionId) {
-          return {
-            ...session,
-            messages: [
-              ...session.messages,
-              {
-                id: userMessageId,
-                role: 'user',
-                content,
-                timestamp: new Date(),
-              }
-            ],
-            updatedAt: new Date(),
-          };
-        }
-        return session;
-      }));
-      
-      setIsTyping(true);
-      
-      // Process the restart response after a delay
-      setTimeout(() => {
-        const wasHandled = handleConversationRestart(content);
-        setIsTyping(false);
-      }, 1000);
-      
-      return;
-    }
 
     // Add user message
     const userMessageId = Date.now().toString();
@@ -385,7 +322,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Show typing indicator
     setIsTyping(true);
 
-    // Process response based on current step and path
     setTimeout(() => {
       const path = currentSession.path;
       const step = currentSession.currentStep || 0;
@@ -413,24 +349,35 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           case 1: // After user shares what they're feeling
             botResponse = `Feel ${content} — what does ${content} feel like?`;
             newStep = 2;
+            setFeelingAnswers(prev => ({ ...prev, feeling_answer1: content }));
             break;
           case 2: // After user describes what the feeling feels like
             botResponse = "What would the opposite of that feel like? How do you want to feel?";
             newStep = 3;
-          break;
+            setFeelingAnswers(prev => ({ ...prev, feeling_answer2: content }));
+            break;
           case 3: // After user shares how they're feeling now
             botResponse = `Where and how do you feel ${content} now?`;
             newStep = 4;
+            setFeelingAnswers(prev => ({ ...prev, feeling_answer3: content }));
             break;
           case 4: // After user shares how they want to feel
-            botResponse = `What would it feel like to ${content}?`;
+            botResponse = `What would it feel like be ${feelingAnswers.feeling_answer3}?`;
             newStep = 5;
+            setFeelingAnswers(prev => ({ ...prev, feeling_answer4: content }));
             break;
           case 5: // Final response based on their feelings
-            botResponse = findBestResponse(content, 'feeling');
+            console.log('isFeelingChecked------------------------>', isFeelingChecked);
+            if (isFeelingChecked) {
+              setTimeout(() => {
+                createNewSession();
+              }, 300);
+            } else if (cycleRepeat === 0) {
+              botResponse = "OK, let's check your feelings.";
+            } else {
+              botResponse = "Please check your feelings again!";
+            }
             break;
-          default:
-            botResponse = findBestResponse(content, 'feeling');
         }
       } 
       // Process goals path
@@ -439,28 +386,39 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           case 1: // After user shares their goal
             botResponse = `What would it feel like to ${content}?`;
             newStep = 2;
+            setGoalAnswers(prev => ({ ...prev, goal_answer1: content }));
             break;
           case 2: // After user describes what achieving the goal would feel like
             botResponse = `Feel ${content} — what does ${content} feel like?`;
             newStep = 3;
+            setGoalAnswers(prev => ({ ...prev, goal_answer2: content }));
             break;
           case 3: // After user describes that feeling
             botResponse = "What would the opposite of that feel like? How do you want to feel?";
             newStep = 4;
+            setGoalAnswers(prev => ({ ...prev, goal_answer3: content }));
             break;
           case 4: // After user describes how they're feeling now
             botResponse = `Where and how do you feel ${content} now?`;
             newStep = 5;
+            setGoalAnswers(prev => ({ ...prev, goal_answer4: content }));
             break;
           case 5: // After user describes how they want to feel
-            botResponse = `What would it feel like to ${content}?`;
+            botResponse = `What would it feel like to be ${goalAnswers.goal_answer4}?`;
             newStep = 6;
+            setGoalAnswers(prev => ({ ...prev, goal_answer5: content }));
             break;
           case 6: // Final response based on their goal
-            botResponse = findBestResponse(content, 'goal');
+            if (isGoalChecked) {
+              setTimeout(() => {
+                createNewSession();
+              }, 300);
+            } else if (cycleRepeat === 0) {
+              botResponse = "OK, let's check your feelings.";
+            } else {
+              botResponse = "Please check your feelings again!";
+            }
             break;
-          default:
-            botResponse = findBestResponse(content, 'goal');
         }
       }
 
@@ -487,7 +445,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }));
       
       setIsTyping(false);
-    }, 1000); // 1 second delay to simulate typing
+    }, 300); 
   };
 
   const value = {
@@ -504,7 +462,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     startCycleCheck,
     isCycleActive,
     handleCycleResponse,
-    cycleStep
+    isFeelingChecked,
+    isGoalChecked,
+    cycleStep,
+    feelingAnswers,
+    goalAnswers,
+    cycleRepeat
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

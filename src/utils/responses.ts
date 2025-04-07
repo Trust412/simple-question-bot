@@ -93,7 +93,6 @@ export const feelingResponses: FeelingResponse[] = [
       "Sometimes loneliness points us toward important connections we're missing. What kind of relationship might your heart be seeking?"
     ]
   },
-  // Default response if no keywords match
   {
     keywords: ['default'],
     responses: [

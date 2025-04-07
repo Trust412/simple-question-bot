@@ -14,7 +14,8 @@ const ChatUI: React.FC = () => {
     sendMessage, 
     selectPath,
     isTyping,
-    setIsMobileSidebarOpen 
+    cycleRepeat,
+    setIsMobileSidebarOpen,
   } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -28,10 +29,13 @@ const ChatUI: React.FC = () => {
 
   const handleSendMessage = (content: string) => {
     sendMessage(content);
+    console.log('currentSession------------------------>', currentSession);
+    console.log('cycleRepeat------------------------>', cycleRepeat);
   };
 
   const handlePathSelection = (path: 'feeling' | 'goal') => {
     selectPath(path);
+    console.log('Path selected------------------------>', path);
   };
 
   const handleOpenSidebar = () => {
