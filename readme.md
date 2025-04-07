@@ -21,7 +21,7 @@ To use the bot, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/trust412/feeling-and-flow-bot.git
+   git clone https://github.com/trust412/simple-question-bot.git
    cd feeling-and-flow-bot
    ```
 

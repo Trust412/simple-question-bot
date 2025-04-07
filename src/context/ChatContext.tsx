@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ChatSession, PathType } from '../types/chat';
-import { generateFeelingQuestions, generateGoalQuestions } from '../data/responses';
+import { generateFeelingQuestions, generateGoalQuestions, checkValidInput } from '../data/responses';
 
 // Define the shape of our context
 interface ChatContextType {
@@ -205,7 +205,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }));
         setIsTyping(false);
       }
-      // If they still have the primary feeling, go back to asking what it feels like
       else if (cycleStep === 'primary' && isStillFeeling) {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
@@ -230,7 +229,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsCycleActive(false);
         setIsTyping(false);
       }
-      // If they no longer have the primary feeling, ask how they're feeling now
       else if (cycleStep === 'primary' && !isStillFeeling) {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
@@ -263,7 +261,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 300);
   };
 
-  // Select conversation path (feeling or goal)
   const selectPath = (path: PathType) => {
     if (!currentSessionId) return;
 
@@ -348,24 +345,44 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (path === 'feeling') {
         switch (step) {
           case 1: // After user shares what they're feeling
-            botResponse = generateFeelingQuestions(content).question1;
-            newStep = 2;
-            setFeelingAnswers(prev => ({ ...prev, feeling_answer1: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateFeelingQuestions(content).question1;
+              newStep = 2;
+              setFeelingAnswers(prev => ({ ...prev, feeling_answer1: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 2: // After user describes what the feeling feels like
-            botResponse = "What would the opposite of that feel like? How do you want to feel?";
-            newStep = 3;
-            setFeelingAnswers(prev => ({ ...prev, feeling_answer2: content }));
+            if (checkValidInput(content)) {
+              botResponse = "What would the opposite of that feel like? How do you want to feel?";
+              newStep = 3;
+              setFeelingAnswers(prev => ({ ...prev, feeling_answer2: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 3: // After user shares how they're feeling now
-            botResponse = generateFeelingQuestions(content).question3;
-            newStep = 4;
-            setFeelingAnswers(prev => ({ ...prev, feeling_answer3: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateFeelingQuestions(content).question3;
+              newStep = 4;
+              setFeelingAnswers(prev => ({ ...prev, feeling_answer3: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 4: // After user shares how they want to feel
-            botResponse = generateFeelingQuestions(feelingAnswers.feeling_answer3).question4;
-            newStep = 5;
-            setFeelingAnswers(prev => ({ ...prev, feeling_answer4: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateFeelingQuestions(feelingAnswers.feeling_answer3).question4;
+              newStep = 5;
+              setFeelingAnswers(prev => ({ ...prev, feeling_answer4: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 5: // Final response based on their feelings
             console.log('isFeelingChecked------------------------>', isFeelingChecked);
@@ -385,30 +402,55 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (path === 'goal') {
         switch (step) {
           case 1: // After user shares their goal
-            botResponse = generateGoalQuestions(content).question1;
-            console.log('content------------------------>', content);
-            newStep = 2;
-            setGoalAnswers(prev => ({ ...prev, goal_answer1: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateGoalQuestions(content).question1;
+              console.log('content------------------------>', content);
+              newStep = 2;
+              setGoalAnswers(prev => ({ ...prev, goal_answer1: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 2: // After user describes what achieving the goal would feel like
-            botResponse = generateGoalQuestions(content).question2;
-            newStep = 3;
-            setGoalAnswers(prev => ({ ...prev, goal_answer2: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateGoalQuestions(content).question2;
+              newStep = 3;
+              setGoalAnswers(prev => ({ ...prev, goal_answer2: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 3: // After user describes that feeling
-            botResponse = "What would the opposite of that feel like? How do you want to feel?";
-            newStep = 4;
-            setGoalAnswers(prev => ({ ...prev, goal_answer3: content }));
+            if (checkValidInput(content)) {
+              botResponse = "What would the opposite of that feel like? How do you want to feel?";
+              newStep = 4;
+              setGoalAnswers(prev => ({ ...prev, goal_answer3: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 4: // After user describes how they're feeling now
-            botResponse = generateGoalQuestions(content).question4;
-            newStep = 5;
-            setGoalAnswers(prev => ({ ...prev, goal_answer4: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateGoalQuestions(content).question4;
+              newStep = 5;
+              setGoalAnswers(prev => ({ ...prev, goal_answer4: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 5: // After user describes how they want to feel
-            botResponse = generateGoalQuestions(goalAnswers.goal_answer4).question5;
-            newStep = 6;
-            setGoalAnswers(prev => ({ ...prev, goal_answer5: content }));
+            if (checkValidInput(content)) {
+              botResponse = generateGoalQuestions(goalAnswers.goal_answer4).question5;
+              newStep = 6;
+              setGoalAnswers(prev => ({ ...prev, goal_answer5: content }));
+              break;
+            } else {
+              botResponse = "I can't understand you. I can only help with feelings and goals.";
+            }
             break;
           case 6: // Final response based on their goal
             if (isGoalChecked) {

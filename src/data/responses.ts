@@ -312,6 +312,317 @@ export const feelingKeywords = [
   },
 ];
 
+export const goalKeywords = [
+  {
+    keywords: [
+      "health",
+      "fitness",
+      "exercise",
+      "workout",
+      "weight",
+      "diet",
+      "nutrition",
+      "wellness",
+      "wellbeing",
+      "physical",
+      "body",
+      "strength",
+      "endurance",
+      "flexibility",
+      "stamina",
+      "vitality",
+      "energy",
+      "lifestyle",
+      "habits",
+      "routine",
+      "training",
+      "conditioning",
+    ],
+  },
+  {
+    keywords: [
+      "career",
+      "job",
+      "work",
+      "professional",
+      "business",
+      "promotion",
+      "advancement",
+      "development",
+      "growth",
+      "skills",
+      "expertise",
+      "leadership",
+      "management",
+      "entrepreneur",
+      "startup",
+      "company",
+      "industry",
+      "field",
+      "vocation",
+      "occupation",
+      "profession",
+      "trade",
+      "craft",
+      "specialty",
+      "competence",
+      "proficiency",
+      "mastery",
+      "excellence",
+      "achievement",
+    ],
+  },
+  {
+    keywords: [
+      "learning",
+      "education",
+      "study",
+      "skill",
+      "knowledge",
+      "growth",
+      "development",
+      "training",
+      "course",
+      "class",
+      "school",
+      "university",
+      "college",
+      "degree",
+      "certification",
+      "qualification",
+      "understanding",
+      "wisdom",
+      "intelligence",
+      "intellect",
+      "comprehension",
+      "grasp",
+      "insight",
+      "awareness",
+      "consciousness",
+      "enlightenment",
+      "illumination",
+      "realization",
+    ],
+  },
+  {
+    keywords: [
+      "relationship",
+      "family",
+      "friend",
+      "partner",
+      "marriage",
+      "connection",
+      "social",
+      "love",
+      "romance",
+      "dating",
+      "companionship",
+      "friendship",
+      "community",
+      "network",
+      "support",
+      "bond",
+      "attachment",
+      "intimacy",
+      "trust",
+      "communication",
+      "tie",
+      "link",
+      "association",
+      "affiliation",
+      "alliance",
+      "partnership",
+      "collaboration",
+      "cooperation",
+    ],
+  },
+  {
+    keywords: [
+      "financial",
+      "money",
+      "saving",
+      "investing",
+      "debt",
+      "budget",
+      "wealth",
+      "income",
+      "earnings",
+      "salary",
+      "finance",
+      "banking",
+      "retirement",
+      "security",
+      "stability",
+      "freedom",
+      "independence",
+      "assets",
+      "resources",
+      "prosperity",
+      "riches",
+      "fortune",
+      "affluence",
+      "opulence",
+      "luxury",
+      "abundance",
+      "plenty",
+      "success",
+    ],
+  },
+  {
+    keywords: [
+      "creative",
+      "art",
+      "music",
+      "write",
+      "paint",
+      "create",
+      "expression",
+      "imagination",
+      "inspiration",
+      "design",
+      "craft",
+      "compose",
+      "perform",
+      "dance",
+      "theater",
+      "photography",
+      "sculpture",
+      "poetry",
+      "storytelling",
+      "innovation",
+      "creativity",
+      "artistry",
+      "craftsmanship",
+      "skill",
+      "talent",
+      "ability",
+      "gift",
+      "genius",
+      "brilliance",
+      "mastery",
+    ],
+  },
+  {
+    keywords: [
+      "home",
+      "house",
+      "apartment",
+      "move",
+      "renovation",
+      "decorate",
+      "living",
+      "space",
+      "environment",
+      "interior",
+      "furniture",
+      "design",
+      "comfort",
+      "shelter",
+      "residence",
+      "dwelling",
+      "property",
+      "real estate",
+      "neighborhood",
+      "abode",
+      "habitat",
+      "quarters",
+      "lodging",
+      "accommodation",
+      "refuge",
+      "sanctuary",
+    ],
+  },
+  {
+    keywords: [
+      "mental",
+      "emotional",
+      "therapy",
+      "healing",
+      "self-care",
+      "wellness",
+      "meditation",
+      "mindfulness",
+      "psychology",
+      "counseling",
+      "growth",
+      "awareness",
+      "insight",
+      "understanding",
+      "balance",
+      "harmony",
+      "peace",
+      "clarity",
+      "focus",
+      "presence",
+      "attention",
+      "concentration",
+      "lucidity",
+      "sanity",
+      "reason",
+    ],
+  },
+  {
+    keywords: [
+      "travel",
+      "adventure",
+      "explore",
+      "trip",
+      "journey",
+      "vacation",
+      "holiday",
+      "destination",
+      "experience",
+      "discovery",
+      "wanderlust",
+      "exploration",
+      "expedition",
+      "excursion",
+      "tour",
+      "sightseeing",
+      "backpacking",
+      "road trip",
+      "getaway",
+      "escape",
+      "voyage",
+      "outing",
+      "jaunt",
+      "stroll",
+      "ramble",
+    ],
+  },
+  {
+    keywords: [
+      "purpose",
+      "meaning",
+      "spiritual",
+      "faith",
+      "fulfillment",
+      "values",
+      "beliefs",
+      "philosophy",
+      "principles",
+      "morals",
+      "ethics",
+      "vision",
+      "mission",
+      "calling",
+      "destiny",
+      "path",
+      "growth",
+      "transformation",
+      "enlightenment",
+      "significance",
+      "importance",
+      "value",
+      "worth",
+      "merit",
+      "virtue",
+      "goodness",
+      "righteousness",
+    ],
+  },
+];
+
 function cleanInput(input: string): string {
   // Remove common words and clean up the input 
   const wordsToRemove = ['i', 'am', 'feel', 'feeling', 'was', 'my', 'going to', 'to'];
@@ -389,4 +700,61 @@ export function generateGoalQuestions(input: string):{ question1: string; questi
       question5: `What would it feel like to be ${formattedKeywords}?`,
     };
   }
+}
+
+export function checkValidInput(input: string): boolean {
+  // Check for empty or whitespace-only input
+  if (!input || input.trim().length === 0) {
+    return false;
+  }
+
+  // Check for minimum length
+  if (input.trim().length < 2) {
+    return false;
+  }
+
+  // Check for maximum length
+  if (input.trim().length > 100) {
+    return false;
+  }
+
+  // Check for common spam patterns
+  const spamPatterns = [
+    /http[s]?:\/\/\S+/i, // URLs
+    /@\S+/i, // Email addresses
+    /[A-Z]{3,}/, // Excessive capitalization
+    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{3,}/, // Excessive special characters
+    /\b(?:viagra|cialis|porn|sex|casino|gambling|bitcoin|crypto)\b/i, // Common spam words
+  ];
+
+  for (const pattern of spamPatterns) {
+    if (pattern.test(input)) {
+      return false;
+    }
+  }
+
+  // Check for repeated characters (e.g., "aaaaa")
+  if (/(.)\1{4,}/.test(input)) {
+    return false;
+  }
+
+  // Check for keyboard smashing (e.g., "asdfghjkl")
+  if (/[a-z]{8,}/i.test(input) && !/[aeiouy]{2,}/i.test(input)) {
+    return false;
+  }
+
+  // Check if input contains any feeling or goal keywords
+  // const allKeywords = [
+  //   ...feelingKeywords.flatMap(category => category.keywords),
+  //   ...goalKeywords.flatMap(category => category.keywords)
+  // ];
+
+  // const inputWords = input.toLowerCase().split(/\s+/);
+  // const hasValidKeywords = inputWords.some(word => 
+  //   allKeywords.some(keyword => 
+  //     word.includes(keyword.toLowerCase()) || 
+  //     keyword.toLowerCase().includes(word)
+  //   )
+  // );
+  return true;
 }
