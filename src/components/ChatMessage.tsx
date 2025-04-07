@@ -8,7 +8,7 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isBot = message.role === 'bot';
-  
+  // console.log(message);
   return (
     <div 
       className={cn(
