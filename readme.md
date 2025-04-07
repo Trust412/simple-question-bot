@@ -32,6 +32,6 @@ To use the bot, follow these steps:
 
 3. **Run the Bot**:
    ```bash
-npm run dev
+   npm run dev
    ```
 
