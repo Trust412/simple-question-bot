@@ -681,7 +681,7 @@ export function generateFeelingQuestions(input: string):{ question1: string; que
 export function generateGoalQuestions(input: string):{ question1: string; question2: string; question4: string; question5: string} {
   const processedInput = processComplexSentences(input);
   console.log('processedInput------------------------>', processedInput);
-  const matchingKeywords = findMatchingKeywords(processedInput, goalKeywords.flatMap(r => r.keywords));
+  const matchingKeywords = findMatchingKeywords(processedInput, feelingKeywords.flatMap(r => r.keywords));
   console.log('matchingKeywords------------------------>', matchingKeywords);
   if (matchingKeywords.length === 0) {
     return {
