@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ChatSession, PathType } from '../types/chat';
+import { generateFeelingQuestions, generateGoalQuestions } from '../data/responses';
 
 // Define the shape of our context
 interface ChatContextType {
@@ -116,7 +117,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
   // Start the cycle check process
-  const startCycleCheck = () => {
+  const startCycleCheck = async() => {
     if (!currentSession) return;
     
     
@@ -136,7 +137,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               {
                 id: botMessageId,
                 role: 'bot',
-                content: `Do you still feel ${feelingAnswers.feeling_answer2}?`,
+                content: generateFeelingQuestions(feelingAnswers.feeling_answer2).questionCycle,
                 timestamp: new Date(),
               }
             ],
@@ -150,7 +151,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Handle user's response to a cycle question
-  const handleCycleResponse = (isStillFeeling: boolean) => {
+  const handleCycleResponse = async(isStillFeeling: boolean) => {
     if (!currentSession) return;
     setIsTyping(true);
     setCycleRepeat(cycleRepeat + 1);
@@ -168,7 +169,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Do you still feel ${feelingAnswers.feeling_answer2}?`,
+                  content: generateFeelingQuestions(feelingAnswers.feeling_answer2).questionCycle,
                   timestamp: new Date(),
                 }
               ],
@@ -192,7 +193,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Do you still feel ${feelingAnswers.feeling_answer1}?`,
+                  content: generateFeelingQuestions(feelingAnswers.feeling_answer1).questionCycle,
                   timestamp: new Date(),
                 }
               ],
@@ -215,7 +216,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `Feel ${feelingAnswers.feeling_answer1} — what does ${feelingAnswers.feeling_answer1} feel like?`,
+                  content: generateFeelingQuestions(feelingAnswers.feeling_answer1).question1,
                   timestamp: new Date(),
                 }
               ],
@@ -240,7 +241,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 {
                   id: botMessageId,
                   role: 'bot',
-                  content: `If you don't feel ${feelingAnswers.feeling_answer1} anymore, you can leave the chat. Wish you a successful day! 😁😁😁`,
+                  content: generateFeelingQuestions(feelingAnswers.feeling_answer1).questionCycle2,
                   timestamp: new Date(),
                 }
               ],
@@ -295,7 +296,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  const sendMessage = (content: string) => {
+  const sendMessage = async(content: string) => {
     if (!currentSessionId || !currentSession) return;
 
     // Add user message
@@ -347,7 +348,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (path === 'feeling') {
         switch (step) {
           case 1: // After user shares what they're feeling
-            botResponse = `Feel ${content} — what does ${content} feel like?`;
+            botResponse = generateFeelingQuestions(content).question1;
             newStep = 2;
             setFeelingAnswers(prev => ({ ...prev, feeling_answer1: content }));
             break;
@@ -357,12 +358,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setFeelingAnswers(prev => ({ ...prev, feeling_answer2: content }));
             break;
           case 3: // After user shares how they're feeling now
-            botResponse = `Where and how do you feel ${content} now?`;
+            botResponse = generateFeelingQuestions(content).question3;
             newStep = 4;
             setFeelingAnswers(prev => ({ ...prev, feeling_answer3: content }));
             break;
           case 4: // After user shares how they want to feel
-            botResponse = `What would it feel like be ${feelingAnswers.feeling_answer3}?`;
+            botResponse = generateFeelingQuestions(feelingAnswers.feeling_answer3).question4;
             newStep = 5;
             setFeelingAnswers(prev => ({ ...prev, feeling_answer4: content }));
             break;
@@ -384,12 +385,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       else if (path === 'goal') {
         switch (step) {
           case 1: // After user shares their goal
-            botResponse = `What would it feel like to ${content}?`;
+            botResponse = generateGoalQuestions(content).question1;
+            console.log('content------------------------>', content);
             newStep = 2;
             setGoalAnswers(prev => ({ ...prev, goal_answer1: content }));
             break;
           case 2: // After user describes what achieving the goal would feel like
-            botResponse = `Feel ${content} — what does ${content} feel like?`;
+            botResponse = generateGoalQuestions(content).question2;
             newStep = 3;
             setGoalAnswers(prev => ({ ...prev, goal_answer2: content }));
             break;
@@ -399,12 +401,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setGoalAnswers(prev => ({ ...prev, goal_answer3: content }));
             break;
           case 4: // After user describes how they're feeling now
-            botResponse = `Where and how do you feel ${content} now?`;
+            botResponse = generateGoalQuestions(content).question4;
             newStep = 5;
             setGoalAnswers(prev => ({ ...prev, goal_answer4: content }));
             break;
           case 5: // After user describes how they want to feel
-            botResponse = `What would it feel like to be ${goalAnswers.goal_answer4}?`;
+            botResponse = generateGoalQuestions(goalAnswers.goal_answer4).question5;
             newStep = 6;
             setGoalAnswers(prev => ({ ...prev, goal_answer5: content }));
             break;
