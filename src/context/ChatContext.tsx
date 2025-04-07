@@ -53,7 +53,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       messages: [{
         id: Date.now().toString(),
         role: 'bot',
-        content: 'How do you want to start today?\n\n1. How you feel\n2. Start with a goal',
+        content: 'How do you want to start today?\n Click one of the following options',
         timestamp: new Date(),
       }],
       createdAt: new Date(),
@@ -346,7 +346,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // After sending goodbye message, create a new session automatically
       setTimeout(() => {
         createNewSession();
-      }, 1500);
+      }, 2000);
       
       return true;
     }
@@ -459,7 +459,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             break;
           case 5: // Final response based on their feelings
             botResponse = findBestResponse(content, 'feeling');
-            // Add a prompt to start again
             botResponse += "\n\nWould you like to start another conversation? (yes/no)";
             break;
           default:
