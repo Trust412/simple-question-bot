@@ -672,7 +672,7 @@ export function generateFeelingQuestions(input: string):{ question1: string; que
       question3: `Where and how do you feel ${formattedKeywords} now?`,
       question4: `What would it feel like to be ${formattedKeywords}?`,
       questionCycle: `Do you still feel ${formattedKeywords}?`,
-      questionCycle2: `If you don't feel ${formattedKeywords} anymore, you can leave the chat. Wish you a successful day! 😁��😁`,
+      questionCycle2: `If you don't feel ${formattedKeywords} anymore, you can leave the chat. Wish you a successful day! 😁😁😁`,
     };
   }
 }
