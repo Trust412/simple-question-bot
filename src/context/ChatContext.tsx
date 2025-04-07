@@ -446,11 +446,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newStep = 2;
             break;
           case 2: // After user describes what the feeling feels like
-            botResponse = "How are you feeling about this now?";
-            newStep = 3;
-            break;
-          case 3: // After user shares how they're feeling now
             botResponse = "What would the opposite of that feel like? How do you want to feel?";
+            newStep = 3;
+          break;
+          case 3: // After user shares how they're feeling now
+          botResponse = "How are you feeling about this now?";
             newStep = 4;
             break;
           case 4: // After user shares how they want to feel
@@ -459,7 +459,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             break;
           case 5: // Final response based on their feelings
             botResponse = findBestResponse(content, 'feeling');
-            botResponse += "\n\nWould you like to start another conversation? (yes/no)";
             break;
           default:
             botResponse = findBestResponse(content, 'feeling');
@@ -477,11 +476,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             newStep = 3;
             break;
           case 3: // After user describes that feeling
-            botResponse = "How are you feeling about this now?";
+            botResponse = "What would the opposite of that feel like? How do you want to feel?";
             newStep = 4;
             break;
           case 4: // After user describes how they're feeling now
-            botResponse = "What would the opposite of that feel like? How do you want to feel?";
+            botResponse = "How are you feeling about this now?";
             newStep = 5;
             break;
           case 5: // After user describes how they want to feel
@@ -490,8 +489,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             break;
           case 6: // Final response based on their goal
             botResponse = findBestResponse(content, 'goal');
-            // Add a prompt to start again
-            botResponse += "\n\nWould you like to start another conversation? (yes/no)";
             break;
           default:
             botResponse = findBestResponse(content, 'goal');
