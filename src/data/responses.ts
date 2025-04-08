@@ -632,8 +632,8 @@ function cleanInput(input: string): string {
     // 'the', 'a', 'an', 'that', 'this', 'these', 'those', 'it',
     // 'in', 'on', 'at', 'for', 'with', 'about', 'of', 'from',
     // 'or', 'but', 'so', 'because', 'if', 'when', 'while',
-    // 'very', 'really', 'quite', 'too', 'much', 'many', 'some',
-    // 'just', 'only', 'even', 'still', 'already', 'yet', 'again'
+    'very', 'really', 'quite', 'too', 'much', 'many', 'some',
+    'even', 'still', 'already', 'yet', 'again'
   ];
   
   // Convert to lowercase and split into words
