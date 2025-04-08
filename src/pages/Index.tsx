@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -6,7 +5,7 @@ import ChatInput from '@/components/ChatInput';
 import ChatMessage from '@/components/ChatMessage';
 import Sidebar from '@/components/Sidebar';
 import { Menu } from 'lucide-react';
-import { ChatProvider, useChat } from '@/context/ChatContext';
+import { ChatProvider, useChat} from '@/context/ChatContext';
 
 const ChatUI: React.FC = () => {
   const { 
@@ -104,7 +103,7 @@ const ChatUI: React.FC = () => {
         <div className="p-4 border-t">
           <ChatInput 
             onSendMessage={handleSendMessage} 
-            disabled={isInputDisabled} 
+            disabled={isInputDisabled}
           />
         </div>
       </div>

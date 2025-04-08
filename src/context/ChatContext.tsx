@@ -153,9 +153,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               {
                 id: botMessageId,
                 role: 'bot',
-                content: generateGoalQuestions(goalAnswers.goal_answer3).questionCycle,
+                content: generateGoalQuestions(goalAnswers.goal_answer2).questionCycle,
                 timestamp: new Date(),
-            }
+              }
             ],
             updatedAt: new Date(),
             currentStep: 3,

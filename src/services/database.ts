@@ -11,7 +11,9 @@ db.exec(`
     id TEXT PRIMARY KEY,
     role TEXT NOT NULL,
     content TEXT NOT NULL,
-    timestamp DATETIME NOT NULL
+    timestamp DATETIME NOT NULL,
+    session_id TEXT NOT NULL,
+    user_id TEXT NOT NULL
   );
 `);
 
@@ -20,25 +22,39 @@ interface DBMessage {
   role: MessageRole;
   content: string;
   timestamp: string;
+  session_id: string;
+  user_id: string;
 }
 
 // Message operations
-export const saveMessage = (message: ChatMessage) => {
+export const saveMessage = (message: ChatMessage, sessionId: string, userId: string) => {
   const stmt = db.prepare(`
-    INSERT INTO messages (id, role, content, timestamp)
-    VALUES (@id, @role, @content, @timestamp)
+    INSERT INTO messages (id, role, content, timestamp, session_id, user_id)
+    VALUES (@id, @role, @content, @timestamp, @session_id, @user_id)
   `);
   stmt.run({
     id: message.id,
     role: message.role,
     content: message.content,
-    timestamp: message.timestamp.toISOString()
+    timestamp: message.timestamp.toISOString(),
+    session_id: sessionId,
+    user_id: userId
   });
 };
 
 export const getAllMessages = (): DBMessage[] => {
   const stmt = db.prepare('SELECT * FROM messages ORDER BY timestamp ASC');
   return stmt.all() as DBMessage[];
+};
+
+export const getMessagesByUser = (userId: string): DBMessage[] => {
+  const stmt = db.prepare('SELECT * FROM messages WHERE user_id = ? ORDER BY timestamp ASC');
+  return stmt.all(userId) as DBMessage[];
+};
+
+export const getMessagesBySession = (sessionId: string): DBMessage[] => {
+  const stmt = db.prepare('SELECT * FROM messages WHERE session_id = ? ORDER BY timestamp ASC');
+  return stmt.all(sessionId) as DBMessage[];
 };
 
 // Cleanup function
