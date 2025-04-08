@@ -209,6 +209,8 @@ export const feelingKeywords = [
       "resolute",
       "eager",
       "enthusiastic",
+      "certain",
+      "clear",
       "keen",
       "aspiring",
       "ambitious",
@@ -625,39 +627,92 @@ export const goalKeywords = [
 
 function cleanInput(input: string): string {
   // Remove common words and clean up the input 
-  const wordsToRemove = ['i', 'am', 'feel', 'feeling', 'was', 'my', 'going to', 'to'];
-  const words = input.toLowerCase().split(' ');
-  return words.filter(word => !wordsToRemove.includes(word)).join(' ');
+  const wordsToRemove = [
+    'i', 'am', 'feel', 'feeling', 'was', 'my', 'going to', 'to',
+    'the', 'a', 'an', 'that', 'this', 'these', 'those', 'it',
+    'in', 'on', 'at', 'for', 'with', 'about', 'of', 'from',
+    'and', 'or', 'but', 'so', 'because', 'if', 'when', 'while',
+    'very', 'really', 'quite', 'too', 'much', 'many', 'some',
+    'just', 'only', 'even', 'still', 'already', 'yet', 'again'
+  ];
+  
+  // Convert to lowercase and split into words
+  const words = input.toLowerCase().split(/\s+/);
+  
+  // Filter out words to remove and empty strings
+  const filteredWords = words.filter(word => 
+    word.length > 0 && 
+    !wordsToRemove.includes(word) &&
+    !/^[.,!?;:(){}'"`~@#$%^&*_+=|\\<>/]+$/.test(word)
+  );
+  
+  return filteredWords.join(' ');
 }
 
-function findMatchingKeywords(input: string, keywords: string[]):string[] {
-  const lowerInput = input.toLowerCase();
-  const inputWords = lowerInput.split(/\s+/); // Split input into words
-  return keywords.filter(keyword => inputWords.includes(keyword.toLowerCase()));
+function conjugatePronounsAndVerbs(text: string): string {
+  // Replace first person pronouns with second person
+  const pronounMap = {
+    'i': 'you',
+    'me': 'you',
+    'my': 'your',
+    'mine': 'yours',
+    'myself': 'yourself',
+    'am': 'are',
+    'was': 'were',
+    'have': 'have',
+    'has': 'have'
+  };
+
+  // Create a regex pattern for all pronouns
+  const pronounPattern = new RegExp(
+    `\\b(${Object.keys(pronounMap).join('|')})\\b`,
+    'gi'
+  );
+
+  return text.replace(pronounPattern, match => {
+    const lowerMatch = match.toLowerCase();
+    return pronounMap[lowerMatch] || match;
+  });
 }
-function formatKeywords(keywords: string[]):string[] {
+
+function processComplexSentences(input: string): string {
+  // Split by common sentence separators
+  const sentences = input.split(/[,;.!?]+/).filter(s => s.trim().length > 0);
+  
+  if (sentences.length <= 1) {
+    return cleanInput(input);
+  }
+
+  // Process each sentence
+  const processedSentences = sentences.map((sentence, index) => {
+    const trimmed = sentence.trim();
+    if (index === 0) {
+      // First sentence - just clean it
+      return cleanInput(trimmed);
+    } else {
+      // Subsequent sentences - clean and conjugate pronouns/verbs
+      return conjugatePronounsAndVerbs(cleanInput(trimmed));
+    }
+  });
+
+  return processedSentences.join(', ');
+}
+
+function formatKeywords(keywords: string[]): string[] {
   if (keywords.length === 0) return [];
   if (keywords.length === 1) return [keywords[0]];
   if (keywords.length === 2) return [`${keywords[0]} and ${keywords[1]}`];
-  return [...keywords.slice(0, -1), 'and ' + keywords[keywords.length - 1]];
-}
-function processComplexSentences(input: string):string {
-  const sentences = input.split(/,/).filter(s => s.trim().length > 0);
-  if (sentences.length <= 1) return input;
-  const firstSentence = cleanInput(sentences[0]);
-  const remainingSentences = sentences.slice(1).map(s => {
-    return s.replace(/\bI\b/g, 'you')
-           .replace(/\bam\b/g, 'are')
-           .replace(/\bwas\b/g, 'were');
-  });
-
-  return [firstSentence, ...remainingSentences].join('. ');
+  
+  // For more than 2 keywords, use Oxford comma
+  const allButLast = keywords.slice(0, -1);
+  return [...allButLast, 'and ' + keywords[keywords.length - 1]];
 }
 
 export function generateFeelingQuestions(input: string):{ question1: string; question3: string; question4: string; questionCycle: string; questionCycle2: string } {
   const processedInput = processComplexSentences(input);
   const matchingKeywords = findMatchingKeywords(processedInput, feelingKeywords.flatMap(r => r.keywords));
   const formattedKeywords = formatKeywords(matchingKeywords);
+  console.log('input------------------------>', input);
   if (matchingKeywords.length === 0) {  
     return {
       question1: `Feel ${processedInput} — what does ${processedInput} feel like?`,
@@ -678,17 +733,20 @@ export function generateFeelingQuestions(input: string):{ question1: string; que
 }
 
 // Function to generate goal questions
-export function generateGoalQuestions(input: string):{ question1: string; question2: string; question4: string; question5: string} {
+export function generateGoalQuestions(input: string):{ question1: string; question2: string; question4: string; question5: string; questionCycle: string; questionCycle2: string} {
   const processedInput = processComplexSentences(input);
   console.log('processedInput------------------------>', processedInput);
   const matchingKeywords = findMatchingKeywords(processedInput, feelingKeywords.flatMap(r => r.keywords));
   console.log('matchingKeywords------------------------>', matchingKeywords);
+  console.log('input------------------------>', input);
   if (matchingKeywords.length === 0) {
     return {
       question1: `What would it feel like to ${processedInput}?`,
       question2: `Feel ${processedInput} — what does ${processedInput} feel like?`,
       question4: `Where and how do you feel ${processedInput} now?`,
       question5: `What would it feel like to be ${processedInput}?`,
+      questionCycle: `Do you still feel ${processedInput}?`,
+      questionCycle2: `If you don't feel ${processedInput} anymore, you can leave the chat. Wish you a successful day! 😁😁😁`,
     };
   } 
   else {
@@ -698,6 +756,8 @@ export function generateGoalQuestions(input: string):{ question1: string; questi
       question2: `Feel ${formattedKeywords} — what does ${formattedKeywords} feel like?`,
       question4: `Where and how do you feel ${formattedKeywords} now?`,
       question5: `What would it feel like to be ${formattedKeywords}?`,
+      questionCycle: `Do you still feel ${formattedKeywords}?`,
+      questionCycle2: `If you don't feel ${formattedKeywords} anymore, you can leave the chat. Wish you a successful day! 😁😁😁`,
     };
   }
 }
@@ -718,43 +778,21 @@ export function checkValidInput(input: string): boolean {
     return false;
   }
 
-  // Check for common spam patterns
-  const spamPatterns = [
-    /http[s]?:\/\/\S+/i, // URLs
-    /@\S+/i, // Email addresses
-    /[A-Z]{3,}/, // Excessive capitalization
-    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{3,}/, // Excessive special characters
-    /\b(?:viagra|cialis|porn|sex|casino|gambling|bitcoin|crypto)\b/i, // Common spam words
-  ];
-
-  for (const pattern of spamPatterns) {
-    if (pattern.test(input)) {
-      return false;
-    }
-  }
-
   // Check for repeated characters (e.g., "aaaaa")
   if (/(.)\1{4,}/.test(input)) {
     return false;
   }
-
-  // Check for keyboard smashing (e.g., "asdfghjkl")
-  if (/[a-z]{8,}/i.test(input) && !/[aeiouy]{2,}/i.test(input)) {
-    return false;
-  }
-
-  // Check if input contains any feeling or goal keywords
-  // const allKeywords = [
-  //   ...feelingKeywords.flatMap(category => category.keywords),
-  //   ...goalKeywords.flatMap(category => category.keywords)
-  // ];
-
-  // const inputWords = input.toLowerCase().split(/\s+/);
-  // const hasValidKeywords = inputWords.some(word => 
-  //   allKeywords.some(keyword => 
-  //     word.includes(keyword.toLowerCase()) || 
-  //     keyword.toLowerCase().includes(word)
-  //   )
-  // );
   return true;
+}
+
+function findMatchingKeywords(input: string, keywords: string[]):string[] {
+  const lowerInput = input.toLowerCase();
+  // Split by both commas and 'and' to handle both formats
+  const inputWords = lowerInput.split(/[,]|\sand\s/).map(word => word.trim());
+  
+  return keywords.filter(keyword => {
+    const lowerKeyword = keyword.toLowerCase();
+    // Check for exact word match in any of the split parts
+    return inputWords.some(word => word === lowerKeyword);
+  });
 }

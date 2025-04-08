@@ -129,7 +129,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTimeout(() => {
       const botMessageId = Date.now().toString();
       setSessions(prev => prev.map(session => {
-        if (session.id === currentSessionId) {
+        if (session.id === currentSessionId && currentSession?.path === 'feeling') {
           return {
             ...session,
             messages: [
@@ -142,6 +142,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               }
             ],
             updatedAt: new Date(),
+            currentStep: 2,
+          };
+        }
+        else if (session.id === currentSessionId && currentSession?.path === 'goal') {
+          return {
+            ...session,
+            messages: [
+              ...session.messages,
+              {
+                id: botMessageId,
+                role: 'bot',
+                content: generateGoalQuestions(goalAnswers.goal_answer3).questionCycle,
+                timestamp: new Date(),
+            }
+            ],
+            updatedAt: new Date(),
+            currentStep: 3,
           };
         }
         return session;
@@ -159,7 +176,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const botMessageId = Date.now().toString();
       
       // If they still have the secondary feeling, ask the same question again
-      if (cycleStep === 'secondary' && isStillFeeling) {
+      if (cycleStep === 'secondary' && isStillFeeling && currentSession.path === 'feeling') {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
             return {
@@ -174,7 +191,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               ],
               updatedAt: new Date(),
-              currentStep: session.path === 'feeling' ? 2 : 3,
+              currentStep: 2,
             };
           }
           return session;
@@ -182,7 +199,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsTyping(false);
       } 
       // If they no longer have the secondary feeling, ask about primary feeling
-      else if (cycleStep === 'secondary' && !isStillFeeling) {
+      else if (cycleStep === 'secondary' && !isStillFeeling && currentSession.path === 'feeling') {
         setCycleStep('primary');
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
@@ -198,14 +215,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               ],
               updatedAt: new Date(),
-              currentStep: session.path === 'feeling' ? 2 : 3,
+              currentStep: 2,
             };
           }
           return session;
         }));
         setIsTyping(false);
       }
-      else if (cycleStep === 'primary' && isStillFeeling) {
+      else if (cycleStep === 'primary' && isStillFeeling && currentSession.path === 'feeling') {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
             return {
@@ -220,7 +237,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               ],
               updatedAt: new Date(),
-              currentStep: session.path === 'feeling' ? 2 : 3,
+              currentStep: 2,
             };
           }
           return session;
@@ -229,7 +246,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsCycleActive(false);
         setIsTyping(false);
       }
-      else if (cycleStep === 'primary' && !isStillFeeling) {
+      else if (cycleStep === 'primary' && !isStillFeeling && currentSession.path === 'feeling') {
         setSessions(prev => prev.map(session => {
           if (session.id === currentSessionId) {
             return {
@@ -244,7 +261,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
               ],
               updatedAt: new Date(),
-              currentStep: session.path === 'feeling' ? 5 : 6,
+              currentStep: 6,
             };
           }
           return session;
@@ -252,13 +269,104 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCycleStep(null);
         setIsCycleActive(false);
         setIsTyping(false);
-        if (currentSession?.path === 'feeling') {
-          setIsFeelingChecked(true);
-        } else {
-          setIsGoalChecked(true);
-        }
+        setIsFeelingChecked(true);
       }
-    }, 300);
+      else if (cycleStep === 'secondary' && isStillFeeling && currentSession.path === 'goal') {
+        setSessions(prev => prev.map(session => {
+          if (session.id === currentSessionId) {
+            return {
+              ...session,
+              messages: [
+                ...session.messages,
+                {
+                  id: botMessageId,
+                  role: 'bot',
+                  content: generateGoalQuestions(goalAnswers.goal_answer3).questionCycle,
+                  timestamp: new Date(),
+                }
+              ],
+              updatedAt: new Date(),
+              currentStep: 3,
+            };
+          }
+          return session;
+        }));
+        setIsTyping(false);
+      } 
+      // If they no longer have the secondary feeling, ask about primary feeling
+      else if (cycleStep === 'secondary' && !isStillFeeling && currentSession.path === 'goal') {
+        setCycleStep('primary');
+        setSessions(prev => prev.map(session => {
+          if (session.id === currentSessionId) {
+            return {
+              ...session,
+              messages: [
+                ...session.messages,
+                {
+                  id: botMessageId,
+                  role: 'bot',
+                  content: generateGoalQuestions(goalAnswers.goal_answer2).questionCycle,
+                  timestamp: new Date(),
+                }
+              ],
+              updatedAt: new Date(),
+              currentStep: 3,
+            };
+          }
+          return session;
+        }));
+        setIsTyping(false);
+      }
+      else if (cycleStep === 'primary' && isStillFeeling && currentSession.path === 'goal') {
+        setSessions(prev => prev.map(session => {
+          if (session.id === currentSessionId) {
+            return {
+              ...session,
+              messages: [
+                ...session.messages,
+                {
+                  id: botMessageId,
+                  role: 'bot',
+                  content: generateGoalQuestions(goalAnswers.goal_answer2).question1,
+                  timestamp: new Date(),
+                }
+              ],
+              updatedAt: new Date(),
+              currentStep: 3,
+            };
+          }
+          return session;
+        }));
+        setCycleStep(null);
+        setIsCycleActive(false);
+        setIsTyping(false);
+      }
+      else if (cycleStep === 'primary' && !isStillFeeling && currentSession.path === 'goal') {
+        setSessions(prev => prev.map(session => {
+          if (session.id === currentSessionId) {
+            return {
+              ...session,
+              messages: [
+                ...session.messages,
+                {
+                  id: botMessageId,
+                  role: 'bot',
+                  content: generateGoalQuestions(goalAnswers.goal_answer2).questionCycle2,
+                  timestamp: new Date(),
+                }
+              ],
+              updatedAt: new Date(),
+              currentStep: 7,
+            };
+          }
+          return session;
+        }));
+        setCycleStep(null);
+        setIsCycleActive(false);
+        setIsTyping(false);
+        setIsGoalChecked(true);
+      }
+    }, 200);
   };
 
   const selectPath = (path: PathType) => {
@@ -385,17 +493,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             break;
           case 5: // Final response based on their feelings
-            console.log('isFeelingChecked------------------------>', isFeelingChecked);
-            if (isFeelingChecked) {
-              setTimeout(() => {
-                createNewSession();
-              }, 300);
-            } else if (cycleRepeat === 0) {
-              botResponse = "OK, let's check your feelings.";
-            } else {
-              botResponse = "Please check your feelings again!";
-            }
+              botResponse = generateFeelingQuestions(content).question1;
+              newStep = 2;
             break;
+          default:
+            createNewSession();
         }
       } 
       // Process goals path
@@ -452,17 +554,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               botResponse = "I can't understand you. I can only help with feelings and goals.";
             }
             break;
-          case 6: // Final response based on their goal
-            if (isGoalChecked) {
-              setTimeout(() => {
-                createNewSession();
-              }, 300);
-            } else if (cycleRepeat === 0) {
-              botResponse = "OK, let's check your feelings.";
-            } else {
-              botResponse = "Please check your feelings again!";
-            }
+          case 6:
+              botResponse = generateGoalQuestions(content).question2;
+              newStep = 3;
             break;
+          default:
+            createNewSession();
         }
       }
 
